@@ -13,7 +13,7 @@ The project scope includes:
 
 ## Tech Stack
 - Backend: Node.js with Express.js framework.
-- Frontend: React.js (newly implemented frontend).
+- Frontend: React.js.
 - Database: PostgreSQL hosted on a Proxmox server.
 - Video Streaming: HLS (HTTP Live Streaming) using nginx for serving video content.
 - Containerization: Docker with docker-compose for easy deployment.
@@ -21,28 +21,23 @@ The project scope includes:
 ## Current Status
 - Backend API: Implemented using Node.js and Express.js. Successfully connected to a PostgreSQL database hosted on a Proxmox server. Video management endpoints have been implemented. User authentication and authorization have been added using JWT tokens.
 - Frontend: React.js application with a modern UI, including a login page, dashboard with charts and statistics, and other required views (Library, Analytics, Settings, Users). Navigation sidebar with protected routes based on user roles.
-- Video Player: Updated to use Hls.js for HLS content playback, integrated into the Vue.js application via the VideoPlayer component.
+- Video Player: Using Hls.js for HLS content playback in the React.js application.
 - Nginx Configuration: nginx-local.conf provides the current nginx configuration for HLS streaming.
 - Containerization: Dockerfiles have been created for both backend and frontend. A docker-compose.yml file orchestrates the services, including a PostgreSQL database.
 
 ## Completed Tasks
 1. Set up a new backend API project in 'backend-api/'.
-2. Configured PostgreSQL database on Proxmox server at 10.1.1.10.
-3. Created 'video_db' database and 'video_user' role.
-4. Updated backend API to connect to the remote PostgreSQL database.
-5. Successfully tested database connection.
 6. Implemented video management endpoints in the backend API.
-7. Redesigned the frontend Vue.js application with a modern UI.
+7. Implemented a new React.js frontend application with a modern UI.
 8. Created a dashboard with charts and statistics.
 9. Implemented navigation sidebar with routes for Dashboard, Library, Analytics, Settings, and Users.
 10. Added Chart.js integration for data visualization.
-11. Implemented all required views (Library, Analytics, Settings, Users) with full functionality.
-12. Implemented user authentication and authorization using JWT tokens.
-13. Added role-based access control (admin vs regular users).
-14. Created login page and authentication state management.
-15. Implemented route guards to protect authenticated routes.
-16. Prepared the project for containerization using Docker and docker-compose.
-17. Integrated Hls.js for HLS content playback in the frontend Vue.js application.
+11. Implemented user authentication and authorization using JWT tokens.
+12. Added role-based access control (admin vs regular users).
+13. Created login page and authentication state management.
+14. Implemented route guards to protect authenticated routes.
+15. Prepared the project for containerization using Docker and docker-compose.
+16. Integrated Hls.js for HLS content playback in the React.js application.
 
 ## Next Steps
 1. Implement a flexible storage system (initially focusing on local/NFS storage).
@@ -84,7 +79,7 @@ The project currently uses local storage, but is being enhanced to support multi
 
 ## Important Details
 - Backend API runs on port 3001.
-- PostgreSQL database details: host=10.1.1.10, database=video_db, user=video_user, password=Astr0mao@db, port=5432 (for non-containerized setup).
+- PostgreSQL database details: host=10.10.10.10, database=video_db, user=video_user, password=Astr0mao@db, port=5432 (for non-containerized setup).
 - Video content is served using nginx HLS streaming, as configured in nginx-local.conf.
 - The 'player/' folder contains the current video player implementation.
 - Reference site: https://streamhg.com/
