@@ -14,7 +14,7 @@ The project scope includes:
 ## Tech Stack
 - Backend: Node.js with Express.js framework.
 - Frontend: React.js.
-- Database: PostgreSQL hosted on a Proxmox server.
+- Database: PostgreSQL
 - Video Streaming: HLS (HTTP Live Streaming) using nginx for serving video content.
 - Containerization: Docker with docker-compose for easy deployment.
 
