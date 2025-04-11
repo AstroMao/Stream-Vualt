@@ -30,12 +30,91 @@ const pool = new Pool({
   port: process.env.DB_PORT || 5432,
 });
 
-// Test database connection
+// Initialize database
+const initializeDatabase = async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        role VARCHAR(50) NOT NULL DEFAULT 'user',
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS videos (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        original_url VARCHAR(255) NOT NULL,
+        thumbnail VARCHAR(255),
+        duration INTEGER,
+        category VARCHAR(100),
+        user_id INTEGER REFERENCES users(id),
+        uuid VARCHAR(255) NOT NULL,
+        views INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS video_views (
+        id SERIAL PRIMARY KEY,
+        video_id INTEGER REFERENCES videos(id),
+        user_id INTEGER REFERENCES users(id),
+        view_date DATE NOT NULL,
+        watch_time INTEGER NOT NULL DEFAULT 0,
+        max_playback_position INTEGER NOT NULL DEFAULT 0,
+        playback_rate FLOAT NOT NULL DEFAULT 1.0,
+        device_type VARCHAR(50) NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE (video_id, user_id, view_date)
+      );
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS video_heatmap (
+        id SERIAL PRIMARY KEY,
+        video_id INTEGER REFERENCES videos(id),
+        user_id INTEGER REFERENCES users(id),
+        playback_position INTEGER NOT NULL,
+        event_type VARCHAR(50) NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS user_regions (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id),
+        video_id INTEGER REFERENCES videos(id),
+        region VARCHAR(100) NOT NULL,
+        country VARCHAR(100) NOT NULL,
+        city VARCHAR(100) NOT NULL,
+        ip_address VARCHAR(45) NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    console.log('Database initialized successfully');
+  } catch (err) {
+    console.error('Error initializing database:', err);
+    process.exit(1);
+  }
+};
+
+// Test database connection and initialize
 pool.query('SELECT NOW()', (err, res) => {
   if (err) {
     console.error('Error connecting to database:', err);
+    process.exit(1);
   } else {
     console.log('Database connected successfully');
+    initializeDatabase();
   }
 });
 

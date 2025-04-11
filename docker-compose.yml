@@ -13,7 +13,7 @@ services:
       - DB_PORT=5432
       - DB_NAME=${DB_NAME:-video_db}
       - DB_USER=${DB_USER:-video_user}
-      - DB_PASSWORD=${DB_PASSWORD:-Astr0mao@db}
+      - DB_PASSWORD=${DB_PASSWORD:-db_password}
       - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_key}
     depends_on:
       - db
@@ -35,7 +35,7 @@ services:
     environment:
       - POSTGRES_DB=${DB_NAME:-video_db}
       - POSTGRES_USER=${DB_USER:-video_user}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-Astr0mao@db}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-db_password}
     volumes:
       - pgdata:/var/lib/postgresql/data
 

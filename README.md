@@ -1,4 +1,4 @@
-# VideoJS-player Project
+# StreamVualt Project
 
 ## Overview
 This project is a Video-on-Demand (VOD) streaming service platform designed to allow users to access video content through a web interface or embedded players on other websites. The platform will include features for video management, user authentication, and analytics. The project is inspired by and references the functionality of https://streamhg.com/.
@@ -18,34 +18,14 @@ The project scope includes:
 - Video Streaming: HLS (HTTP Live Streaming) using nginx for serving video content.
 - Containerization: Docker with docker-compose for easy deployment.
 
-## Current Status
-- Backend API: Implemented using Node.js and Express.js. Successfully connected to a PostgreSQL database hosted on a Proxmox server. Video management endpoints have been implemented. User authentication and authorization have been added using JWT tokens.
-- Frontend: React.js application with a modern UI, including a login page, dashboard with charts and statistics, and other required views (Library, Analytics, Settings, Users). Navigation sidebar with protected routes based on user roles.
-- Video Player: Using Hls.js for HLS content playback in the React.js application.
-- Nginx Configuration: nginx-local.conf provides the current nginx configuration for HLS streaming.
-- Containerization: Dockerfiles have been created for both backend and frontend. A docker-compose.yml file orchestrates the services, including a PostgreSQL database.
-
-## Completed Tasks
-1. Set up a new backend API project in 'backend-api/'.
-6. Implemented video management endpoints in the backend API.
-7. Implemented a new React.js frontend application with a modern UI.
-8. Created a dashboard with charts and statistics.
-9. Implemented navigation sidebar with routes for Dashboard, Library, Analytics, Settings, and Users.
-10. Added Chart.js integration for data visualization.
-11. Implemented user authentication and authorization using JWT tokens.
-12. Added role-based access control (admin vs regular users).
-13. Created login page and authentication state management.
-14. Implemented route guards to protect authenticated routes.
-15. Prepared the project for containerization using Docker and docker-compose.
-16. Integrated Hls.js for HLS content playback in the React.js application.
-
-## Next Steps
-1. Implement a flexible storage system (initially focusing on local/NFS storage).
-2. Enhance the video management functionality, including video transcoding.
-3. Develop video analytics tracking.
-4. Implement user registration functionality.
-5. Add password reset capabilities.
-6. Explore object storage integration (e.g., MinIO) for future scalability.
+## Key Technical Features
+1. **Video Streaming**: HLS (HTTP Live Streaming) implementation using nginx and Hls.js for seamless video playback.
+2. **User Authentication**: JWT-based authentication with role-based access control for protected routes and admin-only sections.
+3. **Containerization**: Docker with docker-compose for easy deployment of backend, frontend, and PostgreSQL services.
+4. **Video Management**: RESTful API endpoints for video content management and metadata storage in PostgreSQL.
+5. **Modern Frontend**: React.js application with a responsive UI, including features like login page, dashboard, charts, and user management.
+6. **Flexible Storage**: Designed to support multiple storage backends (local, NFS, and future object storage integration).
+7. **Video Analytics**: Enhanced analytics capabilities including watch time tracking, user region tracking, and video heatmap analysis through additional database tables and API endpoints.
 
 ## Storage Options
 The project currently uses local storage, but is being enhanced to support multiple storage backends, including:
