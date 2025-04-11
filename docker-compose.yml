@@ -1,0 +1,43 @@
+version: '3'
+services:
+  backend:
+    build: ./backend-api
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - STORAGE_TYPE=${STORAGE_TYPE:-local}
+      - STORAGE_DIR=${STORAGE_DIR:-/app/storage}
+      - NFS_MOUNT_POINT=${NFS_MOUNT_POINT:-/mnt/nfs}
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-video_db}
+      - DB_USER=${DB_USER:-video_user}
+      - DB_PASSWORD=${DB_PASSWORD:-Astr0mao@db}
+      - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_key}
+    depends_on:
+      - db
+    volumes:
+      - ${STORAGE_DIR:-./storage}:/app/storage
+      - ${NFS_MOUNT_POINT:-./nfs}:/mnt/nfs
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+    depends_on:
+      - backend
+
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=${DB_NAME:-video_db}
+      - POSTGRES_USER=${DB_USER:-video_user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-Astr0mao@db}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
