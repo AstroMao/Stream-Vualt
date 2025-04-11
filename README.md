@@ -79,7 +79,7 @@ The project currently uses local storage, but is being enhanced to support multi
 
 ## Important Details
 - Backend API runs on port 3001.
-- PostgreSQL database details: host=10.10.10.10, database=video_db, user=video_user, password=Astr0mao@db, port=5432 (for non-containerized setup).
+- PostgreSQL database details: host=10.10.10.10, database=video_db, user=video_user, password=password, port=5432 (for non-containerized setup).
 - Video content is served using nginx HLS streaming, as configured in nginx-local.conf.
 - The 'player/' folder contains the current video player implementation.
 - Reference site: https://streamhg.com/
