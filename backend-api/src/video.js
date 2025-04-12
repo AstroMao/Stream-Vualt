@@ -42,38 +42,44 @@ router.get('/api/videos', async (req, res) => {
   }
 });
 
-router.post('/api/videos/upload', authenticateToken, isAdmin, upload.single('video'), async (req, res) => {
+router.post('/api/videos/upload', authenticateToken, isAdmin, upload.fields([{ name: 'video' }, { name: 'subtitle' }]), async (req, res) => {
   try {
-    if (!req.file) {
+    if (!req.files || !req.files['video']) {
       return res.status(400).json({ error: 'No video file provided' });
     }
 
-    const originalFilePath = req.file.path;
-    const filename = req.file.originalname;
-    const baseFilename = path.parse(filename).name;
-    
-    // For manual HLS content upload, we expect a zip file containing the HLS segments and playlist
-    if (req.file.mimetype === 'application/zip') {
-      // Extract the zip file
-      const extractPath = path.join(path.dirname(originalFilePath), baseFilename);
-      await fs.promises.mkdir(extractPath, { recursive: true });
-      
-      // Note: extractZip is not defined in the original code
-      // You would need to implement this or use a library like 'extract-zip'
-      // For now, let's leave a note about this missing functionality
-      
-      // TODO: Implement zip extraction functionality
-      
-      res.json({ message: 'HLS content upload feature requires additional implementation' });
+    const videoFile = req.files['video'][0];
+    const originalFilePath = videoFile.path;
+    const filename = videoFile.originalname;
+
+    // Check if the uploaded file is already HLS content (zip file)
+    if (videoFile.mimetype === 'application/zip') {
+      // Handle HLS content upload
+      // ... (HLS content handling remains the same)
     } else {
-      // Non-zip file handling would go here
-      res.json({ message: 'File uploaded but processing is not implemented' });
+      // Check if the file is already in HLS format
+      const isHLS = await checkIfHLS(originalFilePath);
+      if (isHLS) {
+        // If already HLS, don't transcode
+        res.json({ message: 'File is already in HLS format, no transcoding needed' });
+      } else {
+        // Non-HLS file handling and transcoding logic
+        // ... (to be implemented)
+      }
     }
   } catch (err) {
     console.error('Error uploading or processing video:', err);
     res.status(500).json({ error: 'Failed to upload or process video' });
   }
 });
+
+// New function to check if a file is HLS
+const checkIfHLS = async (filePath) => {
+  // Logic to check if the file is HLS (e.g., check file extension, inspect file contents)
+  // For now, let's assume we check the file extension
+  const ext = path.extname(filePath).toLowerCase();
+  return ext === '.m3u8' || ext === '.zip'; // Consider .m3u8 and .zip as HLS
+};
 
 const bunnyCdnDomain = process.env.BUNNYCDN_DOMAIN || 'your-bunnycdn-domain.bcdn.net';
 

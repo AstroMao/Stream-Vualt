@@ -1,4 +1,4 @@
-const pool = require('./db');
+const { pool } = require('./db');
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
@@ -54,8 +54,8 @@ ${resolution.name}/playlist.m3u8`;
       }
     }
 
-    // Update the video record to mark it as transcoded
-    await pool.query('UPDATE videos SET transcoded = TRUE WHERE id = $1', [videoId]);
+    // Update the video record to mark it as HLS
+    await pool.query('UPDATE videos SET is_hls = TRUE WHERE id = $1', [videoId]);
   } catch (err) {
     console.error('Error transcoding video:', err);
   }
@@ -64,7 +64,7 @@ ${resolution.name}/playlist.m3u8`;
 // This function will be used to transcode videos in the background
 const processVideoTranscoding = async () => {
   try {
-    const result = await pool.query('SELECT * FROM videos WHERE transcoded = FALSE');
+    const result = await pool.query('SELECT * FROM videos WHERE is_hls = FALSE');
     for (const video of result.rows) {
       await transcodeVideoToHLS(video.id, video.original_url, video.uuid);
     }

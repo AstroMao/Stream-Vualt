@@ -29,7 +29,7 @@ const initializeDatabase = async () => {
         user_id INTEGER REFERENCES users(id),
         uuid VARCHAR(255) NOT NULL,
         views INTEGER NOT NULL DEFAULT 0,
-        transcoded BOOLEAN NOT NULL DEFAULT FALSE,
+        is_hls BOOLEAN NOT NULL DEFAULT FALSE,
         language VARCHAR(50),
         subtitle_url VARCHAR(255),
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
