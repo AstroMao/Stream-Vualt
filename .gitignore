@@ -3,3 +3,4 @@ frontend/node_modules/
 backend-api/storage/*
 backend-api/uploads/*
 ffmpeg-hls.txt
+streamhg/

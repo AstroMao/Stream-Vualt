@@ -10,19 +10,20 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const config = require('../index').config;
 
-router.post('/api/videos', authenticateToken, isAdmin, upload.single('video'), async (req, res) => {
+router.post('/api/videos', authenticateToken, isAdmin, upload.fields([{ name: 'video' }, { name: 'subtitle' }]), async (req, res) => {
   try {
-    if (!req.file) {
+    if (!req.files || !req.files['video']) {
       return res.status(400).json({ error: 'No video file provided' });
     }
 
-    const { title, description, thumbnail, duration, category } = req.body;
+    const { title, description, thumbnail, duration, category, language } = req.body;
     const uuid = uuidv4();
-    const originalFilePath = req.file.path;
+    const originalFilePath = req.files['video'][0].path;
+    const subtitleUrl = req.files['subtitle'] ? req.files['subtitle'][0].path : null;
 
     const result = await pool.query(
-      'INSERT INTO videos (title, description, thumbnail, duration, category, user_id, uuid, original_url) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-      [title, description, thumbnail, duration, category, req.user.id, uuid, originalFilePath]
+      'INSERT INTO videos (title, description, thumbnail, duration, category, user_id, uuid, original_url, language, subtitle_url) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
+      [title, description, thumbnail, duration, category, req.user.id, uuid, originalFilePath, language, subtitleUrl]
     );
     res.json(result.rows[0]);
   } catch (err) {
