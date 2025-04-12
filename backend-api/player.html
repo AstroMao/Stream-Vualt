@@ -409,12 +409,12 @@
             });
         });
 
-        // Get video ID from URL parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const videoId = urlParams.get('id');
+        // Get video UUID from URL path
+        const pathParts = window.location.pathname.split('/');
+        const videoId = pathParts[pathParts.length - 1];
 
         if (videoId) {
-            console.log(`Initializing player for video ID: ${videoId}`);
+            console.log(`Initializing player for video UUID: ${videoId}`);
 
             // Initialize the video player with options
             const player = videojs('my-video', {
@@ -451,7 +451,7 @@
             player.qualitySelector();
 
             // Set up the video source - Use the master.m3u8 file which includes quality variants
-            const videoUrl = `/${videoId}/master.m3u8`;
+            const videoUrl = `/hls/${videoId}/master.m3u8`;
             console.log("Video URL:", videoUrl);
 
             player.src({
