@@ -9,6 +9,9 @@ const transcodeVideoToHLS = async (videoId, originalFilePath, uuid) => {
     const hlsDirectory = path.join(config.storage.path, uuid);
     await fs.promises.mkdir(hlsDirectory, { recursive: true });
 
+    // Use Docker Compose exec to run FFmpeg in the ffmpeg service
+    const dockerComposeExec = `docker compose exec -T ffmpeg `;
+
     // Create directories for each resolution
     const resolutions = [
       { name: '480p', scale: '854:480', bitrate: '1000k' },
@@ -20,9 +23,10 @@ const transcodeVideoToHLS = async (videoId, originalFilePath, uuid) => {
       const resolutionDir = path.join(hlsDirectory, resolution.name);
       await fs.promises.mkdir(resolutionDir, { recursive: true });
 
+
       const ffmpegCommand = `ffmpeg -i ${originalFilePath} \
         -map 0:v:0 -map 0:a:0 \
-        -c:v h264_nvenc \
+        -c:v libx264 \
         -filter:v "scale=${resolution.scale}:force_original_aspect_ratio=decrease,pad=${resolution.scale}:(ow-iw)/2:(oh-ih)/2" \
         -b:v ${resolution.bitrate} \
         -c:a aac -b:a 128k -ac 2 \
@@ -33,7 +37,7 @@ const transcodeVideoToHLS = async (videoId, originalFilePath, uuid) => {
         ${resolutionDir}/playlist.m3u8`;
 
       await new Promise((resolve, reject) => {
-        const childProcess = spawn(ffmpegCommand, { shell: true });
+        const childProcess = spawn(dockerComposeExec + ffmpegCommand, { shell: true });
         childProcess.on('close', (code) => {
           if (code === 0) {
             resolve();

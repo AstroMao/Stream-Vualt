@@ -50,23 +50,28 @@ router.post('/api/videos/upload', authenticateToken, isAdmin, upload.fields([{ n
 
     const videoFile = req.files['video'][0];
     const originalFilePath = videoFile.path;
-    const filename = videoFile.originalname;
+    const videoId = req.body.videoId; // Assuming videoId is provided in the request body
 
-    // Check if the uploaded file is already HLS content (zip file)
-    if (videoFile.mimetype === 'application/zip') {
-      // Handle HLS content upload
-      // ... (HLS content handling remains the same)
-    } else {
-      // Check if the file is already in HLS format
-      const isHLS = await checkIfHLS(originalFilePath);
-      if (isHLS) {
-        // If already HLS, don't transcode
-        res.json({ message: 'File is already in HLS format, no transcoding needed' });
-      } else {
-        // Non-HLS file handling and transcoding logic
-        // ... (to be implemented)
-      }
+    if (!videoId) {
+      return res.status(400).json({ error: 'Video ID is required' });
     }
+
+    const storagePath = config.storage.path;
+    const videoDir = path.join(storagePath, videoId.toString());
+    const finalFilePath = path.join(videoDir, videoFile.originalname);
+
+    // Create the video directory and move the uploaded file
+    await fs.promises.mkdir(videoDir, { recursive: true });
+    await fs.promises.rename(originalFilePath, finalFilePath);
+
+    // Create a database record for the uploaded video
+    const uuid = uuidv4();
+    const result = await pool.query(
+      'INSERT INTO videos (title, file_path, uuid, player_url, video_length, file_size, language, subtitle, resolution, is_transcode) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
+      [videoFile.originalname, finalFilePath, uuid, `http://localhost:3001/player/${uuid}`, '00:00:00', videoFile.size, 'en', null, '480p', false]
+    );
+
+    res.json({ message: 'Video upload successful. Transcoding is in progress.', video: result.rows[0] });
   } catch (err) {
     console.error('Error uploading or processing video:', err);
     res.status(500).json({ error: 'Failed to upload or process video' });
@@ -93,7 +98,7 @@ router.get('/api/videos/:id', async (req, res) => {
     }
     
     const video = result.rows[0];
-    const localUrl = `http://localhost:3000/hls/${video.uuid}/master.m3u8`;
+    const localUrl = `http://localhost:3001/hls/${video.id}/${video.uuid}/master.m3u8`;
     const cdnUrl = `https://${bunnyCdnDomain}/hls/${video.uuid}/master.m3u8`;
     
     res.json({

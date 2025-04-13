@@ -16,6 +16,7 @@ services:
       - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_key}
     depends_on:
       - db
+      - ffmpeg
     volumes:
       - ${STORAGE_DIR:-./storage}:/app/storage
       - ${NFS_MOUNT_POINT:-./nfs}:/mnt/nfs
@@ -37,6 +38,12 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD:-db_password}
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  ffmpeg:
+    image: jrottenberg/ffmpeg:latest
+    volumes:
+      - ${STORAGE_DIR:-./storage}:/app/storage
+      - ${NFS_MOUNT_POINT:-./nfs}:/mnt/nfs
 
 volumes:
   pgdata:

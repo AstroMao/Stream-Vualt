@@ -1,8 +1,5 @@
-# Use official Node.js runtime as parent image with FFmpeg
+# Use official Node.js runtime as parent image
 FROM node:18
-
-# Install FFmpeg
-RUN apt-get update && apt-get install -y ffmpeg
 
 # Set working directory in container
 WORKDIR /app
@@ -17,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Expose port that the application will run on
-EXPOSE 3000
+EXPOSE 3001
 
 # Command to run the application
 CMD ["node", "index.js"]

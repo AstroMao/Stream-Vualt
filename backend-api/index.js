@@ -54,7 +54,7 @@ app.use('/hls', express.static(config.storage.path));
 app.use('/static', express.static(path.join(__dirname, 'src')));
 
 app.get('/player/:uuid', (req, res) => {
-  res.sendFile(path.join(__dirname, 'player.html'), {
+  res.sendFile(path.join(__dirname, 'src/player.html'), {
     headers: {
       'Content-Type': 'text/html'
     }
