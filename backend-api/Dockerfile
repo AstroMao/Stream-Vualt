@@ -1,5 +1,5 @@
 # Use official Node.js runtime as parent image
-FROM node:18
+FROM node:23-slim
 
 # Set working directory in container
 WORKDIR /app
