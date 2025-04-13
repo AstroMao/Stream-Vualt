@@ -1,11 +1,9 @@
-const express = require('express');
+const fastify = require('fastify')({ logger: true });
 const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const cors = require('cors');
-const Storage = require('./storage');
-const { spawn } = require('child_process');
-const multer = require('multer');
+const fastifyStatic = require('@fastify/static');
+const multer = require('fastify-multer');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
@@ -38,27 +36,21 @@ const config = {
   }
 };
 
-const storage = new Storage(config.storage.type);
+const storage = require('./storage')(config.storage.type);
 const upload = multer({ dest: 'uploads/' });
 
-module.exports.config = config;
+fastify.register(fastifyStatic, {
+  root: config.storage.path,
+  prefix: '/hls/',
+});
 
-const app = express();
-app.use(express.json());
-app.use(cors({
-  origin: config.cors.origin,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-app.use('/hls', express.static(config.storage.path));
-app.use('/static', express.static(path.join(__dirname, 'src')));
+fastify.register(fastifyStatic, {
+  root: path.join(__dirname, 'src'),
+  prefix: '/static/',
+});
 
-app.get('/player/:uuid', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src/player.html'), {
-    headers: {
-      'Content-Type': 'text/html'
-    }
-  });
+fastify.get('/player/:uuid', async (request, reply) => {
+  return reply.sendFile('player.html', path.join(__dirname, 'src'));
 });
 
 const { pool, initializeDatabase } = require('./src/db');
@@ -101,20 +93,23 @@ const createMockAdminUser = async () => {
   }
 };
 
-
 // Simple test route
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'API is working' });
+fastify.get('/api/test', async () => {
+  return { message: 'API is working' };
 });
 
-const videoRouter = require('./src/video');
-app.use(videoRouter);
-
-const analyticsRouter = require('./src/analytics');
-app.use(analyticsRouter);
+fastify.register(require('./src/video'));
+fastify.register(require('./src/analytics'));
 
 require('./src/transcode');
 
-app.listen(config.server.port, () => {
-  console.log(`Server running on port ${config.server.port}`);
-});
+const start = async () => {
+  try {
+    await fastify.listen({ port: config.server.port });
+  } catch (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
+};
+
+start();
