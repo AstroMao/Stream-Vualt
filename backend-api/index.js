@@ -26,7 +26,7 @@ const config = {
   },
   storage: {
     type: process.env.STORAGE_TYPE || 'local',
-    path: process.env.STORAGE_PATH || './storage',
+    path: path.resolve(process.env.STORAGE_PATH || './storage'),
   },
   security: {
     jwtSecret: process.env.JWT_SECRET || 'your_secure_jwt_secret_key',
@@ -36,17 +36,15 @@ const config = {
   }
 };
 
-const storage = require('./storage')(config.storage.type);
+module.exports.config = config;
+
+const Storage = require('./storage');
+const storage = new Storage(config.storage.type);
 const upload = multer({ dest: 'uploads/' });
 
 fastify.register(fastifyStatic, {
   root: config.storage.path,
   prefix: '/hls/',
-});
-
-fastify.register(fastifyStatic, {
-  root: path.join(__dirname, 'src'),
-  prefix: '/static/',
 });
 
 fastify.get('/player/:uuid', async (request, reply) => {
